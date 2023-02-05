@@ -1,0 +1,15 @@
+
+code ~/.zshrc
+
+source venv/bin/activate
+deactivate
+
+python -m venv venv
+
+python Render3DApp.py
+
+Python 3.8.11
+
+
+
+
