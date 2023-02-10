@@ -23,27 +23,27 @@ class Ui_MainWindow(object):
         
         ###    Left MenuBar  ###
         self.leftPaneHeight = size.height
-        self.leftPaneWidth = 250
+        self.padding_all = 30
         self.leftPanePositionX = 0
         self.leftPanePositionY = 0
         
         ###    Right Layout width, height  ###
-        self.rightPaneHeight = int(self.height / 4)
-        self.rightPaneWidth = self.leftPaneWidth
+        self.right_panel_height = int(self.height / 4)
+        self.padding_right = 300
         
-        self.bodyContentHeight = self.height
-        self.bodyContentWidth = self.width - self.leftPaneWidth - self.rightPaneWidth
+        self.body_content_height = self.height - self.padding_all - self.padding_all
+        self.body_content_width = self.width - self.padding_all - self.padding_right
         
         ###    Right Layout posX, posY  ###
-        self.rightPanePositionX = self.bodyContentWidth + self.leftPaneWidth
+        self.rightPanePositionX = self.body_content_width + self.padding_all
         self.rightPanePositionY = 500
         
         self.grid2dHeight = 0
         self.grid2dWidth = 0
         
-        self.grid3dHeight = int(self.bodyContentHeight / 2)
-        self.grid3dWidth = int(self.bodyContentWidth / 2)
-        self.grid3dpositionX = self.grid3dWidth + self.leftPaneWidth
+        self.grid3dHeight = int(self.body_content_height / 2)
+        self.grid3dWidth = int(self.body_content_width / 2)
+        self.grid3dpositionX = self.grid3dWidth + self.padding_all
         self.grid3dpositionY = self.height - self.grid3dHeight
         
         self.LEFT_X = -10
@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
 
         ###    set size 2D images showing window  ###
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(self.leftPaneWidth, 0, self.bodyContentWidth, self.bodyContentHeight))#(x, y, w, h)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(self.padding_all, self.padding_all, self.body_content_width, self.body_content_height))#(x, y, w, h)
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         
         ###    set all 2D images showing window margin  ###
@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         
         ###     Create Layout btn_load, check_box   ###
         self.btn_box_widget = QtWidgets.QWidget(self.centralwidget)
-        self.btn_box_widget.setGeometry(60, 100, 150, 100)#(x, y, w, h)
+        self.btn_box_widget.setGeometry(self.width - 100, 100, 150, 100)#(x, y, w, h)
         self.btn_box_layout = QtWidgets.QVBoxLayout()
         self.btn_box_widget.setLayout(self.btn_box_layout)
         self.render_3d_layout = QtWidgets.QHBoxLayout()
@@ -162,19 +162,8 @@ class Ui_MainWindow(object):
         
         ###    Create Save button  ###
         self.btn_save = QtWidgets.QPushButton("Save", self.centralwidget)
-        self.btn_save.setGeometry(QtCore.QRect(80, 800, 100, 50))#(x, y, w, h)
+        self.btn_save.setGeometry(QtCore.QRect(self.width - 100, 800, 100, 50))#(x, y, w, h)
         self.btn_save.setStyleSheet("background-color: blue")
-        
-        ###    unkown fuction  ###
-        # self.label_dir = QtWidgets.QLabel(self.centralwidget)
-        # self.label_dir.setGeometry(QtCore.QRect(1260, 1100, 121, 31))#(int x, int y, int w, int h)
-        # self.label_dir.setText("")
-        # self.label_dir.setObjectName("label_dir")
-        
-        ###    set New window button  ###
-        # self.btn_new = QtWidgets.QPushButton(self.centralwidget)
-        # self.btn_new.setGeometry(QtCore.QRect(1510, 850, 200, 50))#(int x, int y, int w, int h)
-        # self.btn_new.setObjectName("btn_new")
         
         ###     Create Layout right of screen    ###
         self.sub_lay_v1 = QtWidgets.QVBoxLayout()
@@ -183,7 +172,7 @@ class Ui_MainWindow(object):
         self.main_layout_right = QtWidgets.QHBoxLayout()
         h_right_widget = QtWidgets.QWidget(self.centralwidget)
         h_right_widget.setLayout(self.main_layout_right)
-        h_right_widget.setGeometry(self.rightPanePositionX, self.rightPanePositionY, self.rightPaneWidth, self.rightPaneHeight)
+        h_right_widget.setGeometry(self.rightPanePositionX, self.rightPanePositionY, self.padding_right, self.right_panel_height)
         
         ###    set YZ slice button  ###
         self.slider_x = QtWidgets.QSlider()
@@ -250,50 +239,30 @@ class Ui_MainWindow(object):
         layout_v_left.setAlignment(label_mode, QtCore.Qt.AlignCenter)
         layout_v_left.setAlignment(self.combobox, QtCore.Qt.AlignCenter)
         widget_left_1.setLayout(layout_v_left)
-        widget_left_1.setGeometry(0, 300, self.leftPaneWidth, 100)#(ax, ay, aw, ah)
+        widget_left_1.setGeometry(self.width - 100, 300, self.padding_all, 100)#(ax, ay, aw, ah)
         
         ###     Create Contrast Widgets     ###
         label_contrast_title = QtWidgets.QLabel()
         label_contrast_title.setText('Contrast Control')
         
-        label_contrast_xy = QtWidgets.QLabel()
-        label_contrast_xz = QtWidgets.QLabel()
-        label_contrast_yz = QtWidgets.QLabel()
-        label_contrast_xy.setText('XY')
-        label_contrast_xz.setText('XZ')
-        label_contrast_yz.setText('YZ')
+        self.label_contrast_val = QtWidgets.QLabel()
         
-        self.contrast_xy = QtWidgets.QLineEdit()
-        self.contrast_xz = QtWidgets.QLineEdit()
-        self.contrast_yz = QtWidgets.QLineEdit()
+        self.contrast_val = QtWidgets.QSlider()
+        self.contrast_val.setEnabled(False)
         
-        self.contrast_xy.setValidator(QtGui.QDoubleValidator(0.0, 3.3, 2))
-        self.contrast_xz.setValidator(QtGui.QDoubleValidator(0.0, 3.3, 2))
-        self.contrast_yz.setValidator(QtGui.QDoubleValidator(0.0, 3.3, 2))
+        self.contrast_val.setMinimum(10)
+        self.contrast_val.setMaximum(30)
         
-        self.contrast_xy.setText('1.5')
-        self.contrast_xz.setText('1.5')
-        self.contrast_yz.setText('1.5')
+        self.contrast_val.setOrientation(QtCore.Qt.Horizontal)
         
         contrast_h_1 = QtWidgets.QHBoxLayout()
-        contrast_h_2 = QtWidgets.QHBoxLayout()
-        contrast_h_3 = QtWidgets.QHBoxLayout()
+        contrast_h_1.addWidget(self.label_contrast_val)
+        contrast_h_1.addWidget(self.contrast_val)
+        
         contrast_v_main = QtWidgets.QVBoxLayout()
-        
-        contrast_h_1.addWidget(label_contrast_xy)
-        contrast_h_1.addWidget(self.contrast_xy)
-        
-        contrast_h_2.addWidget(label_contrast_xz)
-        contrast_h_2.addWidget(self.contrast_xz)
-        
-        contrast_h_3.addWidget(label_contrast_yz)
-        contrast_h_3.addWidget(self.contrast_yz)
-        
         contrast_v_main.addWidget(label_contrast_title)
         contrast_v_main.setAlignment(label_contrast_title, QtCore.Qt.AlignCenter)
         contrast_v_main.addLayout(contrast_h_1)
-        contrast_v_main.addLayout(contrast_h_2)
-        contrast_v_main.addLayout(contrast_h_3)
         
         contrast_widget = QtWidgets.QWidget(self.centralwidget)
         contrast_widget.setLayout(contrast_v_main)
@@ -303,51 +272,24 @@ class Ui_MainWindow(object):
         label_brightness_title = QtWidgets.QLabel()
         label_brightness_title.setText('Brightness control')
         
-        label_brightness_xy = QtWidgets.QLabel()
-        label_brightness_xz = QtWidgets.QLabel()
-        label_brightness_yz = QtWidgets.QLabel()
+        self.label_brightness_val = QtWidgets.QLabel()
         
-        label_brightness_xy.setText('XY')
-        label_brightness_xz.setText('XZ')
-        label_brightness_yz.setText('YZ')
+        self.slider_brightness_val = QtWidgets.QSlider()
+        self.slider_brightness_val.setEnabled(False)
         
-        self.slider_brightness_xy = QtWidgets.QSlider()
-        self.slider_brightness_xz = QtWidgets.QSlider()
-        self.slider_brightness_yz = QtWidgets.QSlider()
+        self.slider_brightness_val.setMinimum(0)
+        self.slider_brightness_val.setMaximum(100)
         
-        self.slider_brightness_xy.setMinimum(0)
-        self.slider_brightness_xy.setMaximum(100)
-        
-        self.slider_brightness_xz.setMinimum(0)
-        self.slider_brightness_xz.setMaximum(100)
-        
-        self.slider_brightness_yz.setMinimum(0)
-        self.slider_brightness_yz.setMaximum(100)
-        
-        self.slider_brightness_xy.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_brightness_xz.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_brightness_yz.setOrientation(QtCore.Qt.Horizontal)
+        self.slider_brightness_val.setOrientation(QtCore.Qt.Horizontal)
         
         brightness_h_1 = QtWidgets.QHBoxLayout()
-        brightness_h_2 = QtWidgets.QHBoxLayout()
-        brightness_h_3 = QtWidgets.QHBoxLayout()
-        
-        brightness_h_1.addWidget(label_brightness_xy)
-        brightness_h_1.addWidget(self.slider_brightness_xy)
-        
-        brightness_h_2.addWidget(label_brightness_xz)
-        brightness_h_2.addWidget(self.slider_brightness_xz)
-        
-        brightness_h_3.addWidget(label_brightness_yz)
-        brightness_h_3.addWidget(self.slider_brightness_yz)
+        brightness_h_1.addWidget(self.label_brightness_val)
+        brightness_h_1.addWidget(self.slider_brightness_val)
         
         brightness_v_layout = QtWidgets.QVBoxLayout()
         brightness_v_layout.addWidget(label_brightness_title)
         brightness_v_layout.setAlignment(label_brightness_title, QtCore.Qt.AlignCenter)
-        
         brightness_v_layout.addLayout(brightness_h_1)
-        brightness_v_layout.addLayout(brightness_h_2)
-        brightness_v_layout.addLayout(brightness_h_3)
 
         brightness_widget = QtWidgets.QWidget(self.centralwidget)
         brightness_widget.setLayout(brightness_v_layout)
@@ -362,10 +304,3 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        # self.btn_load.setText(_translate("MainWindow", "Open File"))
-        # self.btn_save.setText(_translate("MainWindow", "Save"))
-        # self.btn_new.setText(_translate("MainWindow", "New Window"))
-        # self.label_x.setText(_translate("MainWindow", "YZ"))
-        # self.label_y.setText(_translate("MainWindow", "XZ"))
-        # self.label_z.setText(_translate("MainWindow", "XY"))
-        # self.chkbx_3d.setText(_translate("MainWindow", "3D Render"))

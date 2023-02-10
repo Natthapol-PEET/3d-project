@@ -9,7 +9,9 @@ pg.setConfigOption('background', None)
 
 from functools import partial
 from PyQt5.QtCore import pyqtSignal
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui, QtMultimedia
+from PyQt5.QtCore import QUrl
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import cv2
 
 # Import the compiled UI file
@@ -88,22 +90,16 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv
         ###     Contrast control defual value (1.0-3.0)     ###
-        self.alpha_xy = 1.0
-        self.alpha_xz = 1.0
-        self.alpha_yz = 1.0
-        
-        self.contrast_xy.textChanged.connect(self.on_contrast_change_xy)
-        self.contrast_xz.textChanged.connect(self.on_contrast_change_xz)
-        self.contrast_yz.textChanged.connect(self.on_contrast_change_yz)
+        self.alpha = 2.0
+        self.label_contrast_val.setText(str(self.alpha))
+        self.contrast_val.setValue(int(self.alpha * 10))
+        self.contrast_val.valueChanged.connect(self.on_contrast_change_val)
         
         ###     Brightness control defual value (0-100)     ###
-        self.beta_xy = 0
-        self.beta_xz = 0
-        self.beta_yz = 0
-        
-        self.slider_brightness_xy.valueChanged.connect(self.on_brightness_change_xy)
-        self.slider_brightness_xz.valueChanged.connect(self.on_brightness_change_xz)
-        self.slider_brightness_yz.valueChanged.connect(self.on_brightness_change_yz)
+        self.beta = 50
+        self.label_brightness_val.setText(str(self.beta))
+        self.slider_brightness_val.setValue(self.beta)
+        self.slider_brightness_val.valueChanged.connect(self.on_brightness_change_val)
 
         # configure PyQTgraph
         pg.setConfigOption('background', 'k')
@@ -161,10 +157,40 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.spinBox_z.valueChanged.connect(self.update_range_z)
 
         self.combobox.currentTextChanged.connect(self.current_color_changed)
+    
+    def play_sound(self):
+        self.player = QMediaPlayer()
+        full_file_path = os.path.join(os.getcwd(), 'sound', 'shutter-sound.mp3')
+        url = QUrl.fromLocalFile(full_file_path)
+        content = QMediaContent(url)
+        
+        self.player.setMedia(content)
+        self.player.play()
         
     def save_screenshot(self):
-        if not self.isFullScreen(): self.showFullScreen()
-        QtCore.QTimer.singleShot(1000, self.screenshot)
+        self.play_sound()
+        
+        save_path = os.path.join(os.getcwd(), 'src', 'screenshot.png')
+        self.centralwidget.grab().save(save_path)
+        
+        img = cv2.imread(save_path)
+        height, width, channels = img.shape
+        
+        print(dir(self.centralwidget.grab().size()))
+        print(self.centralwidget.grab().size().width())
+        
+        print(self.body_content_width + self.padding_right)
+        
+        print(self.width)
+
+        # crop_img = img[0:height, 0:self.body_content_width]
+        # cv2.imshow("cropped", crop_img)
+        # cv2.waitKey(0)
+
+
+                
+        # if not self.isFullScreen(): self.showFullScreen()
+        # QtCore.QTimer.singleShot(1000, self.screenshot)
         
     def screenshot(self):
         self.preview_screen = QtWidgets.QApplication.primaryScreen().grabWindow(0)
@@ -222,7 +248,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def load_data(self):
         global lastdir
-        lastdir = '/Users/70007742/Documents/dev/Code/3d-project/acne'
+        lastdir = os.path.join(os.getcwd(), 'acne')
         if not lastdir:
             dialog = QtWidgets.QFileDialog(directory=os.path.expanduser(os.path.join('~','/Users/70007742/Documents/dev/Code/3d-project/acne')))
         else:
@@ -252,12 +278,12 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.slider_x.setEnabled(True)
             self.slider_y.setEnabled(True)
             self.slider_z.setEnabled(True)
+            self.slider_brightness_val.setEnabled(True)
+            self.contrast_val.setEnabled(True)
 
             self.slider_x.setValue(int(self.data_3d.shape[0]/2))
             self.slider_y.setValue(int(self.data_3d.shape[1]/2))
             self.slider_z.setValue(int(self.data_3d.shape[2]/2))
-
-            # self.label_dir.setText(targetdir)
             
     def update_range_x(self, avg):
         self.slider_x.setMinimum(0)
@@ -275,58 +301,57 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.set_z(self.slider_z.value())
 
     def set_x(self, x):
-        # self.label_slider_x.setText(str(x))
         navg = self.spinBox_x.value()
         self.img_xy = np.squeeze(np.nanmean(self.data_3d[int(x):int(x)+navg, :, :], 0))
+        self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_CLOCKWISE)
         w, h = self.img_xy.shape
         self.vb_xy.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         self.qtimg_xy.setImage(self.img_xy)
         
     def set_y(self, y):
-        # self.label_slider_y.setText(str(y))
         navg = self.spinBox_y.value()
         self.img_xz = np.squeeze(np.nanmean(self.data_3d[:, int(y):int(y)+navg, :], 1))
+        self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_180)
         w, h = self.img_xz.shape
         self.vb_xz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         self.qtimg_xz.setImage(self.img_xz)
 
     def set_z(self, z):
-        # self.label_slider_z.setText(str(z))
         navg = self.spinBox_z.value()
         self.img_yz = np.squeeze(np.nanmean(self.data_3d[:, :, int(z):int(z)+navg], 2))
+        self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_180)
         w, h = self.img_yz.shape
         self.vb_yz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         self.qtimg_yz.setImage(self.img_yz)
         
-    def on_contrast_change_xy(self, v):
-        self.alpha_xy = float(v)
-        adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha_xy, beta=self.beta_xy)
+    def on_contrast_change_val(self, v):
+        self.alpha = self.verify_val(v)
+        adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha, beta=self.beta)
         self.qtimg_xy.setImage(adjusted)
-    
-    def on_contrast_change_xz(self, v):
-        self.alpha_xz = float(v)
-        adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha_xz, beta=self.beta_xz)
+
+        adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha, beta=self.beta)
         self.qtimg_xz.setImage(adjusted)
     
-    def on_contrast_change_yz(self, v):
-        self.alpha_yz = float(v)
-        adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha_yz, beta=self.beta_yz)
+        adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha, beta=self.beta)
         self.qtimg_yz.setImage(adjusted)
         
-    def on_brightness_change_xy(self, v):
-        self.beta_xy = v
-        adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha_xy, beta=self.beta_xy)
+        self.label_contrast_val.setText(str(self.alpha))
+        
+    def on_brightness_change_val(self, v):
+        self.beta = v
+        adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha, beta=self.beta)
         self.qtimg_xy.setImage(adjusted)
         
-    def on_brightness_change_xz(self, v):
-        self.beta_xz = v
-        adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha_xz, beta=self.beta_xz)
+        adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha, beta=self.beta)
         self.qtimg_xz.setImage(adjusted)
     
-    def on_brightness_change_yz(self, v):
-        self.beta_yz = v
-        adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha_yz, beta=self.beta_yz)
+        adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha, beta=self.beta)
         self.qtimg_yz.setImage(adjusted)
+        
+        self.label_brightness_val.setText(str(v))
+        
+    def verify_val(self, v: str) -> float:
+        return 0.0 if v == '' else v / 10.0
 
 
 def startApp():
