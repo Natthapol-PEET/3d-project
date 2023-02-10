@@ -85,10 +85,10 @@ class Ui_MainWindow(object):
         self.vb_xy.addItem(self.hLine_xy)
         self.plt_xy = pg.PlotItem(viewBox=self.vb_xy)
         self.plt_xy.showGrid(x=True, y=True, alpha=0.2)
-        self.plt_xy.setTitle('XY Slice')
+        self.plt_xy.setTitle('YZ Slice')
         
         ###    Show graph XY Slice  ###
-        self.glw_2d.addItem(self.plt_xy, 0, 0)
+        self.glw_2d.addItem(self.plt_xy, 0, 1)
         
         ###     cross hair in ViewBox XZ   ###
         self.vLine_xz = pg.InfiniteLine(angle=90, movable=False)
@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
         self.plt_xz.setTitle('XZ Slice')
         
         ###    Show graph XZ Slice  ###
-        self.glw_2d.addItem(self.plt_xz, 0, 1)
+        self.glw_2d.addItem(self.plt_xz, 1, 0)
         
         ###     cross hair in ViewBox YZ   ###
         self.vLine_yz = pg.InfiniteLine(angle=90, movable=False)
@@ -123,10 +123,10 @@ class Ui_MainWindow(object):
         self.vb_yz.addItem(self.hLine_yz)
         self.plt_yz = pg.PlotItem(viewBox=self.vb_yz)
         self.plt_yz.showGrid(x=True, y=True, alpha=0.2)
-        self.plt_yz.setTitle('YZ Slice')
+        self.plt_yz.setTitle('XY Slice')
         
         ###    Show graph YZ Slice  ###
-        self.glw_2d.addItem(self.plt_yz, 1, 0)
+        self.glw_2d.addItem(self.plt_yz, 0, 0)
 
         ###    set size 3D images showing window  ###
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
@@ -231,48 +231,6 @@ class Ui_MainWindow(object):
         self.main_layout_right.addLayout(self.sub_lay_v1)
         self.main_layout_right.addLayout(self.sub_lay_v2)
         self.main_layout_right.addLayout(self.sub_lay_v3)
-        
-        ###    set YZ symbol  ###
-        # self.label_x = QtWidgets.QLabel(self.centralwidget)
-        # self.label_x.setGeometry(QtCore.QRect(1400, 520, 100, 100))#(int x, int y, int w, int h)
-        # self.label_x.setObjectName("label_x")
-        
-        ###     set XZ symbol  ###
-        # self.label_y = QtWidgets.QLabel(self.centralwidget)
-        # self.label_y.setGeometry(QtCore.QRect(1600, 520, 100, 100))#(int x, int y, int w, int h)
-        # self.label_y.setObjectName("label_y")
-        
-        ###     set XY symbol  ###
-        # self.label_z = QtWidgets.QLabel(self.centralwidget)
-        # self.label_z.setGeometry(QtCore.QRect(1800, 520, 100, 100))#(int x, int y, int w, int h)
-        # self.label_z.setObjectName("label_z")
-        
-        ###     show interface fuction  ###
-        # self.label_slider_z = QtWidgets.QLabel(self.centralwidget)
-        # self.label_slider_z.setGeometry(QtCore.QRect(1000, 10, 50, 20))#(int x, int y, int w, int h)
-        # self.label_slider_z.setText("")
-        # self.label_slider_z.setAlignment(QtCore.Qt.AlignCenter)
-        # self.label_slider_z.setObjectName("label_slider_z")
-        
-        # self.label_slider_x = QtWidgets.QLabel(self.centralwidget)
-        # self.label_slider_x.setGeometry(QtCore.QRect(1000, 10, 50, 20))#(int x, int y, int w, int h)
-        # self.label_slider_x.setText("")
-        # self.label_slider_x.setAlignment(QtCore.Qt.AlignCenter)
-        # self.label_slider_x.setObjectName("label_slider_x")
-        
-        # self.label_slider_y = QtWidgets.QLabel(self.centralwidget)
-        # self.label_slider_y.setGeometry(QtCore.QRect(1000, 10, 50, 20))#(int x, int y, int w, int h)
-        # self.label_slider_y.setText("")
-        # self.label_slider_y.setAlignment(QtCore.Qt.AlignCenter)
-        # self.label_slider_y.setObjectName("label_slider_y")
-        
-        ###     Menu left pane  ###
-        # self.leftPane = QtWidgets.QVBoxLayout(self.centralwidget)
-        # self.leftPane.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
-        
-        ###     Menu right pane  ###
-        # self.rightPane = QtWidgets.QHBoxLayout(self.centralwidget)
-        # self.rightPane.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
         
         ###     Dropdown, Label Group       ###
         widget_left_1 = QtWidgets.QWidget(self.centralwidget)
