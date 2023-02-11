@@ -216,6 +216,15 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.vLine_xy.setPos(mousePoint.x())
             self.hLine_xy.setPos(mousePoint.y())
             
+            # self.vLine_yz.setPos(mousePoint.x())
+            self.hLine_yz.setPos(mousePoint.y())
+            
+            self.hLine_xz.setPos(self.data_3d.shape[1] - mousePoint.x())
+            # self.vLine_xz.setPos(mousePoint.x())
+            
+            self.set_z(mousePoint.x())
+            self.set_y(self.data_3d.shape[1] - mousePoint.y())
+            
     def mouseMovedXZ(self, evt):
         if not self.cross_section_enable: return
         pos = evt.toPoint()
@@ -223,6 +232,15 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             mousePoint = self.vb_xz.mapSceneToView(pos)
             self.vLine_xz.setPos(mousePoint.x())
             self.hLine_xz.setPos(mousePoint.y())
+            
+            self.vLine_xy.setPos(self.data_3d.shape[1] - mousePoint.y())
+            # self.vLine_xy.setPos(mousePoint.x())
+            
+            # self.hLine_yz.setPos(mousePoint.y())
+            self.vLine_yz.setPos(mousePoint.x())
+            
+            self.set_x(self.data_3d.shape[0] - mousePoint.x())
+            self.set_z(self.data_3d.shape[2] - mousePoint.y())
             
     def mouseMovedYZ(self, evt):
         if not self.cross_section_enable: return
@@ -233,7 +251,13 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.hLine_yz.setPos(mousePoint.y())
             
             self.hLine_xy.setPos(mousePoint.y())
+            self.vLine_xy.setPos(0)
+            
+            self.hLine_xz.setPos(0)
             self.vLine_xz.setPos(mousePoint.x())
+            
+            self.set_x(self.data_3d.shape[0] - mousePoint.x())
+            self.set_y(self.data_3d.shape[1] - mousePoint.y())
             
     def current_color_changed(self, s):
         self.qtimg_xy.setColorMap(s)
@@ -295,9 +319,12 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.slider_smooth_val.setEnabled(True)
             self.lock_cross = False
 
-            self.slider_x.setValue(int(self.data_3d.shape[0]/2))
-            self.slider_y.setValue(int(self.data_3d.shape[1]/2))
-            self.slider_z.setValue(int(self.data_3d.shape[2]/2))
+            # self.slider_x.setValue(int(self.data_3d.shape[0]/2))
+            # self.slider_y.setValue(int(self.data_3d.shape[1]/2))
+            # self.slider_z.setValue(int(self.data_3d.shape[2]/2))
+            self.slider_x.setValue(1)
+            self.slider_y.setValue(1)
+            self.slider_z.setValue(1)
             
     def update_range_x(self, avg):
         # self.slider_x.setMinimum(0)
