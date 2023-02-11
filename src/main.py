@@ -87,6 +87,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # self.showFullScreen = True
         self.cross_section_enable = False
+        self.lock_cross = True
         
         # https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv
         ###     Contrast control defual value (1.0-3.0)     ###
@@ -100,6 +101,12 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.label_brightness_val.setText(str(self.beta))
         self.slider_brightness_val.setValue(self.beta)
         self.slider_brightness_val.valueChanged.connect(self.on_brightness_change_val)
+
+        ###     Smooth control defual value (0-100)     ###
+        self.smooth_val = 1
+        self.label_smooth_val.setText(str(self.smooth_val))
+        self.slider_smooth_val.setValue(self.smooth_val)
+        self.slider_smooth_val.valueChanged.connect(self.on_smooth_change_val)
 
         # configure PyQTgraph
         pg.setConfigOption('background', 'k')
@@ -152,9 +159,9 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.slider_y.setEnabled(False)
         self.slider_z.setEnabled(False)
 
-        self.spinBox_x.valueChanged.connect(self.update_range_x)
-        self.spinBox_y.valueChanged.connect(self.update_range_y)
-        self.spinBox_z.valueChanged.connect(self.update_range_z)
+        # self.spinBox_x.valueChanged.connect(self.update_range_x)
+        # self.spinBox_y.valueChanged.connect(self.update_range_y)
+        # self.spinBox_z.valueChanged.connect(self.update_range_z)
 
         self.combobox.currentTextChanged.connect(self.current_color_changed)
     
@@ -176,19 +183,18 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         img = cv2.imread(save_path)
         height, width, channels = img.shape
         
-        print(dir(self.centralwidget.grab().size()))
-        print(self.centralwidget.grab().size().width())
+        cal_size = (width / self.width) * (self.body_content_width + self.padding_all)
+
+        crop_img = img[0:height, 0:int(cal_size)]
+        cv2.imwrite(save_path, crop_img)
         
-        print(self.body_content_width + self.padding_right)
-        
-        print(self.width)
+        winname = 'save screenshot'
+        cv2.namedWindow(winname)
+        cv2.moveWindow(winname, int((self.width-self.body_content_width)/2), 0)
+        cv2.imshow(winname, crop_img)
+        cv2.waitKey(3000)
+        cv2.destroyAllWindows()
 
-        # crop_img = img[0:height, 0:self.body_content_width]
-        # cv2.imshow("cropped", crop_img)
-        # cv2.waitKey(0)
-
-
-                
         # if not self.isFullScreen(): self.showFullScreen()
         # QtCore.QTimer.singleShot(1000, self.screenshot)
         
@@ -198,6 +204,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.showNormal()
         
     def keyPressEvent(self, event):
+        if self.lock_cross: return
         if event.key() == QtCore.Qt.Key_Space:
             self.cross_section_enable = not self.cross_section_enable
         
@@ -224,6 +231,9 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             mousePoint = self.vb_yz.mapSceneToView(pos)
             self.vLine_yz.setPos(mousePoint.x())
             self.hLine_yz.setPos(mousePoint.y())
+            
+            self.hLine_xy.setPos(mousePoint.y())
+            self.vLine_xz.setPos(mousePoint.x())
             
     def current_color_changed(self, s):
         self.qtimg_xy.setColorMap(s)
@@ -269,39 +279,43 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.vb_yz.setMouseEnabled(x=True, y=True)
 
             self.slider_x.setMinimum(0)
-            self.slider_x.setMaximum(self.data_3d.shape[0]-self.spinBox_x.value())
+            self.slider_x.setMaximum(self.data_3d.shape[0]-self.smooth_val)
             self.slider_y.setMinimum(0)
-            self.slider_y.setMaximum(self.data_3d.shape[1]-self.spinBox_y.value())
+            self.slider_y.setMaximum(self.data_3d.shape[1]-self.smooth_val)
             self.slider_z.setMinimum(0)
-            self.slider_z.setMaximum(self.data_3d.shape[2]-self.spinBox_z.value())
+            self.slider_z.setMaximum(self.data_3d.shape[2]-self.smooth_val)
 
             self.slider_x.setEnabled(True)
             self.slider_y.setEnabled(True)
             self.slider_z.setEnabled(True)
             self.slider_brightness_val.setEnabled(True)
             self.contrast_val.setEnabled(True)
+            self.combobox.setEnabled(True)
+            self.btn_save.setEnabled(True)
+            self.slider_smooth_val.setEnabled(True)
+            self.lock_cross = False
 
             self.slider_x.setValue(int(self.data_3d.shape[0]/2))
             self.slider_y.setValue(int(self.data_3d.shape[1]/2))
             self.slider_z.setValue(int(self.data_3d.shape[2]/2))
             
     def update_range_x(self, avg):
-        self.slider_x.setMinimum(0)
-        self.slider_x.setMaximum(self.data_3d.shape[0] - avg)
+        # self.slider_x.setMinimum(0)
+        # self.slider_x.setMaximum(self.data_3d.shape[0] - avg)
         self.set_x(self.slider_x.value())
 
     def update_range_y(self, avg):
-        self.slider_y.setMinimum(0)
-        self.slider_y.setMaximum(self.data_3d.shape[1] - avg)
+        # self.slider_y.setMinimum(0)
+        # self.slider_y.setMaximum(self.data_3d.shape[1] - avg)
         self.set_y(self.slider_y.value())
 
     def update_range_z(self, avg):
-        self.slider_z.setMinimum(0)
-        self.slider_z.setMaximum(self.data_3d.shape[2] - avg)
+        # self.slider_z.setMinimum(0)
+        # self.slider_z.setMaximum(self.data_3d.shape[2] - avg)
         self.set_z(self.slider_z.value())
 
     def set_x(self, x):
-        navg = self.spinBox_x.value()
+        navg = self.smooth_val
         self.img_xy = np.squeeze(np.nanmean(self.data_3d[int(x):int(x)+navg, :, :], 0))
         self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_CLOCKWISE)
         w, h = self.img_xy.shape
@@ -309,7 +323,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.qtimg_xy.setImage(self.img_xy)
         
     def set_y(self, y):
-        navg = self.spinBox_y.value()
+        navg = self.smooth_val
         self.img_xz = np.squeeze(np.nanmean(self.data_3d[:, int(y):int(y)+navg, :], 1))
         self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_180)
         w, h = self.img_xz.shape
@@ -317,7 +331,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.qtimg_xz.setImage(self.img_xz)
 
     def set_z(self, z):
-        navg = self.spinBox_z.value()
+        navg = self.smooth_val
         self.img_yz = np.squeeze(np.nanmean(self.data_3d[:, :, int(z):int(z)+navg], 2))
         self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_180)
         w, h = self.img_yz.shape
@@ -349,6 +363,13 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.qtimg_yz.setImage(adjusted)
         
         self.label_brightness_val.setText(str(v))
+        
+    def on_smooth_change_val(self, v):
+        self.smooth_val = v
+        self.update_range_x(v)
+        self.update_range_y(v)
+        self.update_range_z(v)
+        self.label_smooth_val.setText(str(v))
         
     def verify_val(self, v: str) -> float:
         return 0.0 if v == '' else v / 10.0

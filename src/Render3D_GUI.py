@@ -135,12 +135,12 @@ class Ui_MainWindow(object):
         
         ###    create grid_3d oblect  ###
         self.grid_3d = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
-        self.grid_3d.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
+        self.grid_3d.setContentsMargins(20, 0, 0, 20)#(left, top, right, bottom)
         self.grid_3d.setObjectName("grid_3d")
         
         ###     Create Layout btn_load, check_box   ###
         self.btn_box_widget = QtWidgets.QWidget(self.centralwidget)
-        self.btn_box_widget.setGeometry(self.width - 100, 100, 150, 100)#(x, y, w, h)
+        self.btn_box_widget.setGeometry(self.width - 230, 100, 150, 100)#(x, y, w, h)
         self.btn_box_layout = QtWidgets.QVBoxLayout()
         self.btn_box_widget.setLayout(self.btn_box_layout)
         self.render_3d_layout = QtWidgets.QHBoxLayout()
@@ -160,11 +160,6 @@ class Ui_MainWindow(object):
         self.render_3d_layout.addWidget(self.chkbx_3d)
         self.btn_box_layout.addLayout(self.render_3d_layout)
         
-        ###    Create Save button  ###
-        self.btn_save = QtWidgets.QPushButton("Save", self.centralwidget)
-        self.btn_save.setGeometry(QtCore.QRect(self.width - 100, 800, 100, 50))#(x, y, w, h)
-        self.btn_save.setStyleSheet("background-color: blue")
-        
         ###     Create Layout right of screen    ###
         self.sub_lay_v1 = QtWidgets.QVBoxLayout()
         self.sub_lay_v2 = QtWidgets.QVBoxLayout()
@@ -172,7 +167,7 @@ class Ui_MainWindow(object):
         self.main_layout_right = QtWidgets.QHBoxLayout()
         h_right_widget = QtWidgets.QWidget(self.centralwidget)
         h_right_widget.setLayout(self.main_layout_right)
-        h_right_widget.setGeometry(self.rightPanePositionX, self.rightPanePositionY, self.padding_right, self.right_panel_height)
+        h_right_widget.setGeometry(700, self.rightPanePositionY, self.padding_right, self.right_panel_height)
         
         ###    set YZ slice button  ###
         self.slider_x = QtWidgets.QSlider()
@@ -182,12 +177,12 @@ class Ui_MainWindow(object):
         self.sub_lay_v1.addWidget(self.slider_x)
         
         ###    Create YZ value box  ###
-        self.spinBox_x = QtWidgets.QSpinBox(self.centralwidget)
-        self.spinBox_x.setGeometry(QtCore.QRect(1360, 510, 100, 40))#(x, y, w, h)
-        self.spinBox_x.setMinimum(1)
-        self.spinBox_x.setMaximum(99)
-        self.spinBox_x.setObjectName("spinBox_x")
-        self.sub_lay_v1.addWidget(self.spinBox_x)
+        # self.spinBox_x = QtWidgets.QSpinBox(self.centralwidget)
+        # self.spinBox_x.setGeometry(QtCore.QRect(1360, 510, 100, 40))#(x, y, w, h)
+        # self.spinBox_x.setMinimum(1)
+        # self.spinBox_x.setMaximum(99)
+        # self.spinBox_x.setObjectName("spinBox_x")
+        # self.sub_lay_v1.addWidget(self.spinBox_x)
         
         ###    set XZ slice button  ###
         self.slider_y = QtWidgets.QSlider()
@@ -197,11 +192,11 @@ class Ui_MainWindow(object):
         self.sub_lay_v2.addWidget(self.slider_y)
         
         ###    Create XZ value box  ###
-        self.spinBox_y = QtWidgets.QSpinBox(self.centralwidget)
-        self.spinBox_y.setGeometry(QtCore.QRect(1560, 510, 100, 40))#(x, y, w, h)
-        self.spinBox_y.setMinimum(1)
-        self.spinBox_y.setObjectName("spinBox_y")
-        self.sub_lay_v2.addWidget(self.spinBox_y)
+        # self.spinBox_y = QtWidgets.QSpinBox(self.centralwidget)
+        # self.spinBox_y.setGeometry(QtCore.QRect(1560, 510, 100, 40))#(x, y, w, h)
+        # self.spinBox_y.setMinimum(1)
+        # self.spinBox_y.setObjectName("spinBox_y")
+        # self.sub_lay_v2.addWidget(self.spinBox_y)
         
         ###    set XY slice button  ###
         self.slider_z = QtWidgets.QSlider()
@@ -211,11 +206,11 @@ class Ui_MainWindow(object):
         self.sub_lay_v3.addWidget(self.slider_z)
         
         ###    set XY value box  ###
-        self.spinBox_z = QtWidgets.QSpinBox(self.centralwidget)
-        self.spinBox_z.setGeometry(QtCore.QRect(1760, 510, 100, 40))#(x, y, w, h)
-        self.spinBox_z.setMinimum(1)
-        self.spinBox_z.setObjectName("spinBox_z")
-        self.sub_lay_v3.addWidget(self.spinBox_z)
+        # self.spinBox_z = QtWidgets.QSpinBox(self.centralwidget)
+        # self.spinBox_z.setGeometry(QtCore.QRect(1760, 510, 100, 40))#(x, y, w, h)
+        # self.spinBox_z.setMinimum(1)
+        # self.spinBox_z.setObjectName("spinBox_z")
+        # self.sub_lay_v3.addWidget(self.spinBox_z)
         
         self.main_layout_right.addLayout(self.sub_lay_v1)
         self.main_layout_right.addLayout(self.sub_lay_v2)
@@ -228,6 +223,7 @@ class Ui_MainWindow(object):
         label_mode.setText('MODE')
         
         self.combobox = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox.setEnabled(False)
         self.combobox.setStyleSheet("background-color: green")
         self.combobox.setFixedHeight(40)
         self.combobox.setFixedWidth(100)
@@ -239,7 +235,7 @@ class Ui_MainWindow(object):
         layout_v_left.setAlignment(label_mode, QtCore.Qt.AlignCenter)
         layout_v_left.setAlignment(self.combobox, QtCore.Qt.AlignCenter)
         widget_left_1.setLayout(layout_v_left)
-        widget_left_1.setGeometry(self.width - 100, 300, self.padding_all, 100)#(ax, ay, aw, ah)
+        widget_left_1.setGeometry(self.width - 230, 230, 150, 100)#(ax, ay, aw, ah)
         
         ###     Create Contrast Widgets     ###
         label_contrast_title = QtWidgets.QLabel()
@@ -266,7 +262,7 @@ class Ui_MainWindow(object):
         
         contrast_widget = QtWidgets.QWidget(self.centralwidget)
         contrast_widget.setLayout(contrast_v_main)
-        contrast_widget.setGeometry(self.width - 240, 50, 200, 150)#(ax, ay, aw, ah)
+        contrast_widget.setGeometry(self.width - 240, 360, 200, 100)#(ax, ay, aw, ah)
         
         ###     Create Widget Brightness       ###
         label_brightness_title = QtWidgets.QLabel()
@@ -293,8 +289,41 @@ class Ui_MainWindow(object):
 
         brightness_widget = QtWidgets.QWidget(self.centralwidget)
         brightness_widget.setLayout(brightness_v_layout)
-        brightness_widget.setGeometry(self.width - 240, 240, 200, 130)#(ax, ay, aw, ah)
+        brightness_widget.setGeometry(self.width - 240, 460, 200, 100)#(ax, ay, aw, ah)
         
+        ###     Create Widget Smooth Blur       ###
+        label_smooth_title = QtWidgets.QLabel()
+        label_smooth_title.setText('Smooth Blue control')
+        
+        self.label_smooth_val = QtWidgets.QLabel()
+        
+        self.slider_smooth_val = QtWidgets.QSlider()
+        self.slider_smooth_val.setEnabled(False)
+        
+        self.slider_smooth_val.setMinimum(1)
+        self.slider_smooth_val.setMaximum(99)
+        
+        self.slider_smooth_val.setOrientation(QtCore.Qt.Horizontal)
+        
+        smooth_h_1 = QtWidgets.QHBoxLayout()
+        smooth_h_1.addWidget(self.label_smooth_val)
+        smooth_h_1.addWidget(self.slider_smooth_val)
+        
+        smooth_v_layout = QtWidgets.QVBoxLayout()
+        smooth_v_layout.addWidget(label_smooth_title)
+        smooth_v_layout.setAlignment(label_smooth_title, QtCore.Qt.AlignCenter)
+        smooth_v_layout.addLayout(smooth_h_1)
+
+        smooth_widget = QtWidgets.QWidget(self.centralwidget)
+        smooth_widget.setLayout(smooth_v_layout)
+        smooth_widget.setGeometry(self.width - 240, 560, 200, 100)#(ax, ay, aw, ah)
+        
+        ###    Create Save button  ###
+        self.btn_save = QtWidgets.QPushButton("Save", self.centralwidget)
+        self.btn_save.setGeometry(QtCore.QRect(self.width - 200, 750, 100, 50))#(x, y, w, h)
+        self.btn_save.setStyleSheet("background-color: blue")
+        self.btn_save.setEnabled(False)
+
         ###     Add Widget to MainWindows   ###
         MainWindow.setCentralWidget(self.centralwidget)
         
