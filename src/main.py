@@ -1,15 +1,12 @@
-import sys, time, os
+import sys, os
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
-from pyqtgraph import ViewBox, ImageItem, ImageView
 import matplotlib.image as mpimg
 
 pg.setConfigOption('background', None)
 
-from functools import partial
-from PyQt5.QtCore import pyqtSignal
-from PyQt5 import QtCore, QtWidgets, QtGui, QtMultimedia
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import cv2
@@ -102,11 +99,11 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.slider_brightness_val.setValue(self.beta)
         self.slider_brightness_val.valueChanged.connect(self.on_brightness_change_val)
 
-        ###     Smooth control defual value (0-100)     ###
-        self.smooth_val = 1
-        self.label_smooth_val.setText(str(self.smooth_val))
-        self.slider_smooth_val.setValue(self.smooth_val)
-        self.slider_smooth_val.valueChanged.connect(self.on_smooth_change_val)
+        ###     navg control defual value (0-100)     ###
+        self.navg_val = 1
+        self.label_navg_val.setText(str(self.navg_val))
+        self.slider_navg_val.setValue(self.navg_val)
+        self.slider_navg_val.valueChanged.connect(self.on_navg_change_val)
 
         # configure PyQTgraph
         pg.setConfigOption('background', 'k')
@@ -150,18 +147,6 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_load.clicked.connect(self.load_data)
         self.btn_save.clicked.connect(self.save_screenshot)
         # self.btn_new.clicked.connect(startApp)
-
-        self.slider_x.valueChanged.connect(self.set_x)
-        self.slider_y.valueChanged.connect(self.set_y)
-        self.slider_z.valueChanged.connect(self.set_z)
-        
-        self.slider_x.setEnabled(False)
-        self.slider_y.setEnabled(False)
-        self.slider_z.setEnabled(False)
-
-        # self.spinBox_x.valueChanged.connect(self.update_range_x)
-        # self.spinBox_y.valueChanged.connect(self.update_range_y)
-        # self.spinBox_z.valueChanged.connect(self.update_range_z)
 
         self.combobox.currentTextChanged.connect(self.current_color_changed)
     
@@ -297,52 +282,32 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.load_3d(self.chkbx_3d.isChecked())
             
-            self.cross_section_enable = True
             self.vb_xy.setMouseEnabled(x=True, y=True)
             self.vb_xz.setMouseEnabled(x=True, y=True)
             self.vb_yz.setMouseEnabled(x=True, y=True)
+            
+            self.set_x(0)
+            self.set_y(0)
+            self.set_z(0)
 
-            self.slider_x.setMinimum(0)
-            self.slider_x.setMaximum(self.data_3d.shape[0]-self.smooth_val)
-            self.slider_y.setMinimum(0)
-            self.slider_y.setMaximum(self.data_3d.shape[1]-self.smooth_val)
-            self.slider_z.setMinimum(0)
-            self.slider_z.setMaximum(self.data_3d.shape[2]-self.smooth_val)
-
-            self.slider_x.setEnabled(True)
-            self.slider_y.setEnabled(True)
-            self.slider_z.setEnabled(True)
             self.slider_brightness_val.setEnabled(True)
             self.contrast_val.setEnabled(True)
             self.combobox.setEnabled(True)
             self.btn_save.setEnabled(True)
-            self.slider_smooth_val.setEnabled(True)
+            self.slider_navg_val.setEnabled(True)
             self.lock_cross = False
-
-            # self.slider_x.setValue(int(self.data_3d.shape[0]/2))
-            # self.slider_y.setValue(int(self.data_3d.shape[1]/2))
-            # self.slider_z.setValue(int(self.data_3d.shape[2]/2))
-            self.slider_x.setValue(1)
-            self.slider_y.setValue(1)
-            self.slider_z.setValue(1)
             
     def update_range_x(self, avg):
-        # self.slider_x.setMinimum(0)
-        # self.slider_x.setMaximum(self.data_3d.shape[0] - avg)
-        self.set_x(self.slider_x.value())
+        self.set_x(self.navg_val)
 
     def update_range_y(self, avg):
-        # self.slider_y.setMinimum(0)
-        # self.slider_y.setMaximum(self.data_3d.shape[1] - avg)
-        self.set_y(self.slider_y.value())
+        self.set_y(self.navg_val)
 
     def update_range_z(self, avg):
-        # self.slider_z.setMinimum(0)
-        # self.slider_z.setMaximum(self.data_3d.shape[2] - avg)
-        self.set_z(self.slider_z.value())
+        self.set_z(self.navg_val)
 
     def set_x(self, x):
-        navg = self.smooth_val
+        navg = self.navg_val
         self.img_xy = np.squeeze(np.nanmean(self.data_3d[int(x):int(x)+navg, :, :], 0))
         self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_CLOCKWISE)
         w, h = self.img_xy.shape
@@ -350,7 +315,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.qtimg_xy.setImage(self.img_xy)
         
     def set_y(self, y):
-        navg = self.smooth_val
+        navg = self.navg_val
         self.img_xz = np.squeeze(np.nanmean(self.data_3d[:, int(y):int(y)+navg, :], 1))
         self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_180)
         w, h = self.img_xz.shape
@@ -358,7 +323,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.qtimg_xz.setImage(self.img_xz)
 
     def set_z(self, z):
-        navg = self.smooth_val
+        navg = self.navg_val
         self.img_yz = np.squeeze(np.nanmean(self.data_3d[:, :, int(z):int(z)+navg], 2))
         self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_180)
         w, h = self.img_yz.shape
@@ -391,12 +356,12 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.label_brightness_val.setText(str(v))
         
-    def on_smooth_change_val(self, v):
-        self.smooth_val = v
+    def on_navg_change_val(self, v):
+        self.navg_val = v
         self.update_range_x(v)
         self.update_range_y(v)
         self.update_range_z(v)
-        self.label_smooth_val.setText(str(v))
+        self.label_navg_val.setText(str(v))
         
     def verify_val(self, v: str) -> float:
         return 0.0 if v == '' else v / 10.0

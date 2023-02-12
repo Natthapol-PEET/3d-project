@@ -6,10 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QVBoxLayout
-from pyqt_loading_progressbar.loadingProgressBar import LoadingProgressBar
-from PyQt5.Qt import QPainter
+from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 
 class Ui_MainWindow(object):
@@ -160,62 +157,6 @@ class Ui_MainWindow(object):
         self.render_3d_layout.addWidget(self.chkbx_3d)
         self.btn_box_layout.addLayout(self.render_3d_layout)
         
-        ###     Create Layout right of screen    ###
-        self.sub_lay_v1 = QtWidgets.QVBoxLayout()
-        self.sub_lay_v2 = QtWidgets.QVBoxLayout()
-        self.sub_lay_v3 = QtWidgets.QVBoxLayout()
-        self.main_layout_right = QtWidgets.QHBoxLayout()
-        h_right_widget = QtWidgets.QWidget(self.centralwidget)
-        h_right_widget.setLayout(self.main_layout_right)
-        h_right_widget.setGeometry(700, self.rightPanePositionY, self.padding_right, self.right_panel_height)
-        
-        ###    set YZ slice button  ###
-        self.slider_x = QtWidgets.QSlider()
-        self.slider_x.setGeometry(QtCore.QRect(1360, 100, 100, 400))#(x, y, w, h)
-        self.slider_x.setOrientation(QtCore.Qt.Vertical)
-        self.slider_x.setObjectName("slider_x")
-        self.sub_lay_v1.addWidget(self.slider_x)
-        
-        ###    Create YZ value box  ###
-        # self.spinBox_x = QtWidgets.QSpinBox(self.centralwidget)
-        # self.spinBox_x.setGeometry(QtCore.QRect(1360, 510, 100, 40))#(x, y, w, h)
-        # self.spinBox_x.setMinimum(1)
-        # self.spinBox_x.setMaximum(99)
-        # self.spinBox_x.setObjectName("spinBox_x")
-        # self.sub_lay_v1.addWidget(self.spinBox_x)
-        
-        ###    set XZ slice button  ###
-        self.slider_y = QtWidgets.QSlider()
-        self.slider_y.setGeometry(QtCore.QRect(1560, 100, 100, 400))#(x, y, w, h)
-        self.slider_y.setOrientation(QtCore.Qt.Vertical)
-        self.slider_y.setObjectName("slider_y")
-        self.sub_lay_v2.addWidget(self.slider_y)
-        
-        ###    Create XZ value box  ###
-        # self.spinBox_y = QtWidgets.QSpinBox(self.centralwidget)
-        # self.spinBox_y.setGeometry(QtCore.QRect(1560, 510, 100, 40))#(x, y, w, h)
-        # self.spinBox_y.setMinimum(1)
-        # self.spinBox_y.setObjectName("spinBox_y")
-        # self.sub_lay_v2.addWidget(self.spinBox_y)
-        
-        ###    set XY slice button  ###
-        self.slider_z = QtWidgets.QSlider()
-        self.slider_z.setGeometry(QtCore.QRect(1760, 100, 100, 400))#(x, y, w, h)
-        self.slider_z.setOrientation(QtCore.Qt.Vertical)
-        self.slider_z.setObjectName("slider_z")
-        self.sub_lay_v3.addWidget(self.slider_z)
-        
-        ###    set XY value box  ###
-        # self.spinBox_z = QtWidgets.QSpinBox(self.centralwidget)
-        # self.spinBox_z.setGeometry(QtCore.QRect(1760, 510, 100, 40))#(x, y, w, h)
-        # self.spinBox_z.setMinimum(1)
-        # self.spinBox_z.setObjectName("spinBox_z")
-        # self.sub_lay_v3.addWidget(self.spinBox_z)
-        
-        self.main_layout_right.addLayout(self.sub_lay_v1)
-        self.main_layout_right.addLayout(self.sub_lay_v2)
-        self.main_layout_right.addLayout(self.sub_lay_v3)
-        
         ###     Dropdown, Label Group       ###
         widget_left_1 = QtWidgets.QWidget(self.centralwidget)
         layout_v_left = QtWidgets.QVBoxLayout()
@@ -291,32 +232,32 @@ class Ui_MainWindow(object):
         brightness_widget.setLayout(brightness_v_layout)
         brightness_widget.setGeometry(self.width - 240, 460, 200, 100)#(ax, ay, aw, ah)
         
-        ###     Create Widget Smooth Blur       ###
-        label_smooth_title = QtWidgets.QLabel()
-        label_smooth_title.setText('Smooth Blue control')
+        ###     Create Widget navg       ###
+        label_navg_title = QtWidgets.QLabel()
+        label_navg_title.setText('NAVG control')
         
-        self.label_smooth_val = QtWidgets.QLabel()
+        self.label_navg_val = QtWidgets.QLabel()
         
-        self.slider_smooth_val = QtWidgets.QSlider()
-        self.slider_smooth_val.setEnabled(False)
+        self.slider_navg_val = QtWidgets.QSlider()
+        self.slider_navg_val.setEnabled(False)
         
-        self.slider_smooth_val.setMinimum(1)
-        self.slider_smooth_val.setMaximum(99)
+        self.slider_navg_val.setMinimum(1)
+        self.slider_navg_val.setMaximum(99)
         
-        self.slider_smooth_val.setOrientation(QtCore.Qt.Horizontal)
+        self.slider_navg_val.setOrientation(QtCore.Qt.Horizontal)
         
-        smooth_h_1 = QtWidgets.QHBoxLayout()
-        smooth_h_1.addWidget(self.label_smooth_val)
-        smooth_h_1.addWidget(self.slider_smooth_val)
+        navg_h_1 = QtWidgets.QHBoxLayout()
+        navg_h_1.addWidget(self.label_navg_val)
+        navg_h_1.addWidget(self.slider_navg_val)
         
-        smooth_v_layout = QtWidgets.QVBoxLayout()
-        smooth_v_layout.addWidget(label_smooth_title)
-        smooth_v_layout.setAlignment(label_smooth_title, QtCore.Qt.AlignCenter)
-        smooth_v_layout.addLayout(smooth_h_1)
+        navg_v_layout = QtWidgets.QVBoxLayout()
+        navg_v_layout.addWidget(label_navg_title)
+        navg_v_layout.setAlignment(label_navg_title, QtCore.Qt.AlignCenter)
+        navg_v_layout.addLayout(navg_h_1)
 
-        smooth_widget = QtWidgets.QWidget(self.centralwidget)
-        smooth_widget.setLayout(smooth_v_layout)
-        smooth_widget.setGeometry(self.width - 240, 560, 200, 100)#(ax, ay, aw, ah)
+        navg_widget = QtWidgets.QWidget(self.centralwidget)
+        navg_widget.setLayout(navg_v_layout)
+        navg_widget.setGeometry(self.width - 240, 560, 200, 100)#(ax, ay, aw, ah)
         
         ###    Create Save button  ###
         self.btn_save = QtWidgets.QPushButton("Save", self.centralwidget)
