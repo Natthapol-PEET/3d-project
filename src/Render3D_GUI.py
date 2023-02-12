@@ -11,11 +11,12 @@ import pyqtgraph as pg
 
 class Ui_MainWindow(object):
     def __init__(self) -> None:
-        self.setStyleSheet("background-color: black;")
+        self.setStyleSheet("background-color: black; ; color: white;")
         
         ###    get size Main window  ###
         size = QtWidgets.QApplication.primaryScreen().size()
-        self.height = size.height() - 150
+        # self.height = size.height() - 150
+        self.height = size.height() - 100
         self.width = size.width()
         
         ###    Left MenuBar  ###
@@ -144,7 +145,7 @@ class Ui_MainWindow(object):
         
         ###    Create Load Dataset button  ###
         self.btn_load = QtWidgets.QPushButton("Open File")
-        self.btn_load.setStyleSheet("background-color: blue; width: 100px; height: 50px")
+        self.btn_load.setStyleSheet("background-color: blue; width: 100px; height: 50px; color: white;")
         self.btn_box_layout.addWidget(self.btn_load)
         
         ###     Create Check Box and Label  ###
@@ -165,7 +166,7 @@ class Ui_MainWindow(object):
         
         self.combobox = QtWidgets.QComboBox(self.centralwidget)
         self.combobox.setEnabled(False)
-        self.combobox.setStyleSheet("background-color: green")
+        self.combobox.setStyleSheet("background-color: green; color: white;")
         self.combobox.setFixedHeight(40)
         self.combobox.setFixedWidth(100)
         self.combobox.addItems(pg.colormap.listMaps())
@@ -262,7 +263,7 @@ class Ui_MainWindow(object):
         ###    Create Save button  ###
         self.btn_save = QtWidgets.QPushButton("Save", self.centralwidget)
         self.btn_save.setGeometry(QtCore.QRect(self.width - 200, 750, 100, 50))#(x, y, w, h)
-        self.btn_save.setStyleSheet("background-color: blue")
+        self.btn_save.setStyleSheet("background-color: blue; color: white;")
         self.btn_save.setEnabled(False)
 
         ###     Add Widget to MainWindows   ###

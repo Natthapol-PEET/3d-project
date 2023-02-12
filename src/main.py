@@ -190,7 +190,8 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def keyPressEvent(self, event):
         if self.lock_cross: return
-        if event.key() == QtCore.Qt.Key_Space:
+        # if event.key() == QtCore.Qt.Key_Space:
+        if event.key() == QtCore.Qt.Key_Shift:
             self.cross_section_enable = not self.cross_section_enable
         
     def mouseMovedXY(self, evt):
@@ -312,7 +313,8 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_CLOCKWISE)
         w, h = self.img_xy.shape
         self.vb_xy.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
-        self.qtimg_xy.setImage(self.img_xy)
+        adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha, beta=self.beta)
+        self.qtimg_xy.setImage(adjusted)
         
     def set_y(self, y):
         navg = self.navg_val
@@ -320,7 +322,8 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_180)
         w, h = self.img_xz.shape
         self.vb_xz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
-        self.qtimg_xz.setImage(self.img_xz)
+        adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha, beta=self.beta)
+        self.qtimg_xz.setImage(adjusted)
 
     def set_z(self, z):
         navg = self.navg_val
@@ -328,7 +331,8 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_180)
         w, h = self.img_yz.shape
         self.vb_yz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
-        self.qtimg_yz.setImage(self.img_yz)
+        adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha, beta=self.beta)
+        self.qtimg_yz.setImage(adjusted)
         
     def on_contrast_change_val(self, v):
         self.alpha = self.verify_val(v)
