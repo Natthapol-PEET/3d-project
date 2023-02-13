@@ -1,6 +1,6 @@
 # 3d-project
 
-## Require
+### Require
 ```bash
 Python 3.10.9
 pip 22.3.1
@@ -11,34 +11,34 @@ pip 22.3.1
 python3 -m venv venv
 ```
 
-## You may activate it 
-### macos, linux or powershell
+### You may activate it 
+macos, linux or powershell
 ```bash
 source venv/bin/activate
 ```
 
-### windows
+windows
 ```bash
 venv\Scripts\activate
 ```
 
-## Install package from requirements.txt
+### Install package from requirements.txt
 ```bash
 pip3 install -r requirements.txt
 ```
 
 ## How to run script
-### macos, linux or powershell
+macos, linux or powershell
 ```bash
 python3 src/main.py
 ```
 
-### windows
+windows
 ```bash
 python3 src\main.py
 ```
 
-## To deactivate a virtual environment, type:
+To deactivate a virtual environment, type:
 ```bash
 deactivate
 ```
