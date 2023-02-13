@@ -6,7 +6,8 @@ Python 3.10.9
 pip 22.3.1
 ```
 
-## Creating Virtual Environments
+## Setup
+Creating Virtual Environments
 ```bash
 python3 -m venv venv
 ```
