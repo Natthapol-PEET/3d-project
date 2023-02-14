@@ -48,6 +48,20 @@ class Ui_MainWindow(object):
         self.RIGHT_X = 0
         self.data = []
         
+        self.color_map_obj = {
+            'plasma': 'plasma',
+            'inferno': 'inferno',
+            'binary': 'CET-C5',
+            'gray': 'CET-L2',
+            'hot red': 'CET-L3',
+            'green': 'CET-L5',
+            'pink': 'CET-L17',
+            'jet': 'CET-R4',
+            'blue': 'CET-CBL2',
+        }
+        
+        self.color_map_current = list(self.color_map_obj.keys())[0]
+        
     def setupUi(self, MainWindow):
         ###    set size Main window  ###
         MainWindow.setObjectName("MainWindow")
@@ -169,8 +183,8 @@ class Ui_MainWindow(object):
         self.combobox.setStyleSheet("background-color: green; color: white;")
         self.combobox.setFixedHeight(40)
         self.combobox.setFixedWidth(100)
-        self.combobox.addItems(pg.colormap.listMaps())
-        self.combobox.setCurrentIndex(pg.colormap.listMaps().index('CET-L2'))
+        self.combobox.addItems(list(self.color_map_obj.keys()))
+        # self.combobox.setCurrentIndex(pg.colormap.listMaps().index('CET-L2'))
         
         layout_v_left.addWidget(label_mode)
         layout_v_left.addWidget(self.combobox)

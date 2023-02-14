@@ -58,7 +58,8 @@ def read_oct_data(filedir):
     filelist = [f for f in os.listdir(filedir) if os.path.isfile(os.path.join(filedir, f))]
 
     # Sort filelist by using the key that is the last integer
-    filelist.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
+    try: filelist.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
+    except: filelist.sort(key=lambda x: int(x.split('.')[0][-1]))
 
     # remove the first frame since it is usually messed up
     filelist = filelist[1:]
@@ -88,13 +89,13 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv
         ###     Contrast control defual value (1.0-3.0)     ###
-        self.alpha = 2.0
+        self.alpha = 1.0
         self.label_contrast_val.setText(str(self.alpha))
         self.contrast_val.setValue(int(self.alpha * 10))
         self.contrast_val.valueChanged.connect(self.on_contrast_change_val)
         
         ###     Brightness control defual value (0-100)     ###
-        self.beta = 50
+        self.beta = 0
         self.label_brightness_val.setText(str(self.beta))
         self.slider_brightness_val.setValue(self.beta)
         self.slider_brightness_val.valueChanged.connect(self.on_brightness_change_val)
@@ -148,7 +149,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btn_save.clicked.connect(self.save_screenshot)
         # self.btn_new.clicked.connect(startApp)
 
-        self.combobox.currentTextChanged.connect(self.current_color_changed)
+        self.combobox.currentTextChanged.connect(self.on_color_changed)
     
     def play_sound(self):
         self.player = QMediaPlayer()
@@ -160,25 +161,35 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.player.play()
         
     def save_screenshot(self):
+        initial_path = os.getcwd()
+        
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self, 
+            "Save Image", initial_path, "Image Files(*.png)", options=options)
+        
+        if fileName == '': return
+        save_path = fileName + '.png'
+        
         self.play_sound()
         
-        save_path = os.path.join(os.getcwd(), 'src', 'screenshot.png')
+        # save_path = os.path.join(os.getcwd(), 'src', 'screenshot.png')
         self.centralwidget.grab().save(save_path)
         
         img = cv2.imread(save_path)
-        height, width, channels = img.shape
+        height, width, _ = img.shape
         
         cal_size = (width / self.width) * (self.body_content_width + self.padding_all)
 
         crop_img = img[0:height, 0:int(cal_size)]
         cv2.imwrite(save_path, crop_img)
         
-        winname = 'save screenshot'
-        cv2.namedWindow(winname)
-        cv2.moveWindow(winname, int((self.width-self.body_content_width)/2), 0)
-        cv2.imshow(winname, crop_img)
-        cv2.waitKey(3000)
-        cv2.destroyAllWindows()
+        # winname = 'save screenshot'
+        # cv2.namedWindow(winname)
+        # cv2.moveWindow(winname, int((self.width-self.body_content_width)/2), 0)
+        # cv2.imshow(winname, crop_img)
+        # cv2.waitKey(3000)
+        # cv2.destroyAllWindows()
 
         # if not self.isFullScreen(): self.showFullScreen()
         # QtCore.QTimer.singleShot(1000, self.screenshot)
@@ -190,10 +201,14 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def keyPressEvent(self, event):
         if self.lock_cross: return
-        # if event.key() == QtCore.Qt.Key_Space:
         if event.key() == QtCore.Qt.Key_Shift:
             self.cross_section_enable = not self.cross_section_enable
-        
+            
+    def mousePressEvent(self, event):
+        if self.lock_cross: return
+        if event.button() == QtCore.Qt.LeftButton:
+            self.cross_section_enable = not self.cross_section_enable
+
     def mouseMovedXY(self, evt):
         if not self.cross_section_enable: return
         pos = evt.toPoint()
@@ -245,10 +260,11 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.set_x(self.data_3d.shape[0] - mousePoint.x())
             self.set_y(self.data_3d.shape[1] - mousePoint.y())
             
-    def current_color_changed(self, s):
-        self.qtimg_xy.setColorMap(s)
-        self.qtimg_xz.setColorMap(s)
-        self.qtimg_yz.setColorMap(s)
+    def on_color_changed(self, s):
+        self.color_map_current = s
+        self.qtimg_xy.setColorMap((self.color_map_obj[self.color_map_current]))
+        self.qtimg_xz.setColorMap((self.color_map_obj[self.color_map_current]))
+        self.qtimg_yz.setColorMap((self.color_map_obj[self.color_map_current]))
         
     def load_3d(self, is_show_3d):
         if is_show_3d and len(self.data_3d):
@@ -268,9 +284,9 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def load_data(self):
         global lastdir
-        lastdir = os.path.join(os.getcwd(), 'acne')
+        lastdir = os.path.join(os.getcwd(), 'dataset')
         if not lastdir:
-            dialog = QtWidgets.QFileDialog(directory=os.path.expanduser(os.path.join('~','/Users/70007742/Documents/dev/Code/3d-project/acne')))
+            dialog = QtWidgets.QFileDialog(directory=os.path.expanduser(os.path.join('~', lastdir)))
         else:
             dialog = QtWidgets.QFileDialog(directory=lastdir)
         dialog.setAcceptMode(1)
@@ -315,6 +331,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.vb_xy.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha, beta=self.beta)
         self.qtimg_xy.setImage(adjusted)
+        self.qtimg_xy.setColorMap(self.color_map_obj[self.color_map_current])
         
     def set_y(self, y):
         navg = self.navg_val
@@ -324,6 +341,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.vb_xz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha, beta=self.beta)
         self.qtimg_xz.setImage(adjusted)
+        self.qtimg_xz.setColorMap(self.color_map_obj[self.color_map_current])
 
     def set_z(self, z):
         navg = self.navg_val
@@ -333,6 +351,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.vb_yz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha, beta=self.beta)
         self.qtimg_yz.setImage(adjusted)
+        self.qtimg_yz.setColorMap(self.color_map_obj[self.color_map_current])
         
     def on_contrast_change_val(self, v):
         self.alpha = self.verify_val(v)
