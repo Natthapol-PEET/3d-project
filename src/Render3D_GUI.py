@@ -184,7 +184,6 @@ class Ui_MainWindow(object):
         self.combobox.setFixedHeight(40)
         self.combobox.setFixedWidth(100)
         self.combobox.addItems(list(self.color_map_obj.keys()))
-        # self.combobox.setCurrentIndex(pg.colormap.listMaps().index('CET-L2'))
         
         layout_v_left.addWidget(label_mode)
         layout_v_left.addWidget(self.combobox)
@@ -245,7 +244,7 @@ class Ui_MainWindow(object):
 
         brightness_widget = QtWidgets.QWidget(self.centralwidget)
         brightness_widget.setLayout(brightness_v_layout)
-        brightness_widget.setGeometry(self.width - 240, 460, 200, 100)#(ax, ay, aw, ah)
+        brightness_widget.setGeometry(self.width - 240, 440, 200, 100)#(ax, ay, aw, ah)
         
         ###     Create Widget navg       ###
         label_navg_title = QtWidgets.QLabel()
@@ -272,13 +271,70 @@ class Ui_MainWindow(object):
 
         navg_widget = QtWidgets.QWidget(self.centralwidget)
         navg_widget.setLayout(navg_v_layout)
-        navg_widget.setGeometry(self.width - 240, 560, 200, 100)#(ax, ay, aw, ah)
+        navg_widget.setGeometry(self.width - 240, 520, 200, 100)#(ax, ay, aw, ah)
         
         ###    Create Save button  ###
         self.btn_save = QtWidgets.QPushButton("Save", self.centralwidget)
-        self.btn_save.setGeometry(QtCore.QRect(self.width - 200, 750, 100, 50))#(x, y, w, h)
+        self.btn_save.setGeometry(QtCore.QRect(self.width - 200, 800, 100, 50))#(x, y, w, h)
         self.btn_save.setStyleSheet("background-color: blue; color: white;")
         self.btn_save.setEnabled(False)
+        
+        ###     Dropdown, Label Group       ###
+        widget_left_1 = QtWidgets.QWidget(self.centralwidget)
+        layout_main_left = QtWidgets.QVBoxLayout()
+        
+        list_rotate = ['0', '90', '180', '270']
+        
+        layout_v_xy_left = QtWidgets.QHBoxLayout()
+        label_xy = QtWidgets.QLabel()
+        label_xy.setText('Rotate XY : ')
+        
+        self.combobox_rotate_xy = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox_rotate_xy.setEnabled(False)
+        self.combobox_rotate_xy.setStyleSheet("background-color: green; color: white;")
+        self.combobox_rotate_xy.setFixedHeight(40)
+        self.combobox_rotate_xy.setFixedWidth(100)
+        self.combobox_rotate_xy.addItems(list_rotate)
+        
+        layout_v_xy_left.addWidget(label_xy)
+        layout_v_xy_left.addWidget(self.combobox_rotate_xy)
+        layout_v_xy_left.setAlignment(self.combobox_rotate_xy, QtCore.Qt.AlignmentFlag.AlignRight)
+        layout_main_left.addLayout(layout_v_xy_left)
+        
+        layout_v_xz_left = QtWidgets.QHBoxLayout()
+        label_xz = QtWidgets.QLabel()
+        label_xz.setText('Rotate XZ : ')
+        
+        self.combobox_rotate_xz = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox_rotate_xz.setEnabled(False)
+        self.combobox_rotate_xz.setStyleSheet("background-color: green; color: white;")
+        self.combobox_rotate_xz.setFixedHeight(40)
+        self.combobox_rotate_xz.setFixedWidth(100)
+        self.combobox_rotate_xz.addItems(list_rotate)
+        
+        layout_v_xz_left.addWidget(label_xz)
+        layout_v_xz_left.addWidget(self.combobox_rotate_xz)
+        layout_v_xz_left.setAlignment(self.combobox_rotate_xz, QtCore.Qt.AlignmentFlag.AlignRight)
+        layout_main_left.addLayout(layout_v_xz_left)
+        
+        layout_v_yz_left = QtWidgets.QHBoxLayout()
+        label_yz = QtWidgets.QLabel()
+        label_yz.setText('Rotate YZ : ')
+        
+        self.combobox_rotate_yz = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox_rotate_yz.setEnabled(False)
+        self.combobox_rotate_yz.setStyleSheet("background-color: green; color: white;")
+        self.combobox_rotate_yz.setFixedHeight(40)
+        self.combobox_rotate_yz.setFixedWidth(100)
+        self.combobox_rotate_yz.addItems(list_rotate)
+        
+        layout_v_yz_left.addWidget(label_yz)
+        layout_v_yz_left.addWidget(self.combobox_rotate_yz)
+        layout_v_yz_left.setAlignment(self.combobox_rotate_yz, QtCore.Qt.AlignmentFlag.AlignRight)
+        layout_main_left.addLayout(layout_v_yz_left)
+        
+        widget_left_1.setLayout(layout_main_left)
+        widget_left_1.setGeometry(self.width - 250, 615, 210, 150)#(ax, ay, aw, ah)
 
         ###     Add Widget to MainWindows   ###
         MainWindow.setCentralWidget(self.centralwidget)

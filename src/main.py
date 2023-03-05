@@ -106,6 +106,19 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.slider_navg_val.setValue(self.navg_val)
         self.slider_navg_val.valueChanged.connect(self.on_navg_change_val)
 
+        ###     Rotate xy, xz, yz  (0, 90, 180, 270)   ###
+        self.flag_rotate_xy = 0
+        self.flag_rotate_xz = 0
+        self.flag_rotate_yz = 0
+        
+        self.mouse_set_x = 0
+        self.mouse_set_y = 0
+        self.mouse_set_z = 0
+        
+        self.combobox_rotate_xy.currentTextChanged.connect(self.on_rotate_xy_change)
+        self.combobox_rotate_xz.currentTextChanged.connect(self.on_rotate_xz_change)
+        self.combobox_rotate_yz.currentTextChanged.connect(self.on_rotate_yz_change)
+
         # configure PyQTgraph
         pg.setConfigOption('background', 'k')
         pg.setConfigOption('foreground', 'w')
@@ -150,7 +163,7 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
         # self.btn_new.clicked.connect(startApp)
 
         self.combobox.currentTextChanged.connect(self.on_color_changed)
-    
+        
     def play_sound(self):
         self.player = QMediaPlayer()
         full_file_path = os.path.join(os.getcwd(), 'sound', 'shutter-sound.mp3')
@@ -223,8 +236,11 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.hLine_xz.setPos(self.data_3d.shape[1] - mousePoint.x())
             # self.vLine_xz.setPos(mousePoint.x())
             
-            self.set_z(mousePoint.x())
-            self.set_y(self.data_3d.shape[1] - mousePoint.y())
+            self.mouse_set_z = self.data_3d.shape[2] - mousePoint.x()
+            self.mouse_set_y = self.data_3d.shape[1] - mousePoint.y()
+            
+            self.set_z(self.mouse_set_z)
+            self.set_y(self.mouse_set_y)
             
     def mouseMovedXZ(self, evt):
         if not self.cross_section_enable: return
@@ -240,8 +256,11 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             # self.hLine_yz.setPos(mousePoint.y())
             self.vLine_yz.setPos(mousePoint.x())
             
-            self.set_x(self.data_3d.shape[0] - mousePoint.x())
-            self.set_z(self.data_3d.shape[2] - mousePoint.y())
+            self.mouse_set_x = mousePoint.x()
+            self.mouse_set_y = mousePoint.y()
+            
+            self.set_x(self.mouse_set_x)
+            self.set_z(self.mouse_set_y)
             
     def mouseMovedYZ(self, evt):
         if not self.cross_section_enable: return
@@ -257,8 +276,11 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.hLine_xz.setPos(0)
             self.vLine_xz.setPos(mousePoint.x())
             
-            self.set_x(self.data_3d.shape[0] - mousePoint.x())
-            self.set_y(self.data_3d.shape[1] - mousePoint.y())
+            self.mouse_set_x = mousePoint.x()
+            self.mouse_set_y = self.data_3d.shape[1] - mousePoint.y()
+            
+            self.set_x(self.mouse_set_x)
+            self.set_y(self.mouse_set_y)
             
     def on_color_changed(self, s):
         self.color_map_current = s
@@ -310,6 +332,9 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.slider_brightness_val.setEnabled(True)
             self.contrast_val.setEnabled(True)
             self.combobox.setEnabled(True)
+            self.combobox_rotate_xy.setEnabled(True)
+            self.combobox_rotate_xz.setEnabled(True)
+            self.combobox_rotate_yz.setEnabled(True)
             self.btn_save.setEnabled(True)
             self.slider_navg_val.setEnabled(True)
             self.lock_cross = False
@@ -322,11 +347,33 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def update_range_z(self, avg):
         self.set_z(self.navg_val)
+        
+    def on_rotate_xy_change(self, v):
+        self.flag_rotate_xy = int(v)
+        self.set_x(self.mouse_set_x)
+    
+    def on_rotate_xz_change(self, v):
+        self.flag_rotate_xz = int(v)
+        self.set_y(self.mouse_set_y)
+    
+    def on_rotate_yz_change(self, v):
+        self.flag_rotate_yz = int(v)
+        self.set_z(self.mouse_set_z)
 
     def set_x(self, x):
         navg = self.navg_val
         self.img_xy = np.squeeze(np.nanmean(self.data_3d[int(x):int(x)+navg, :, :], 0))
-        self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_CLOCKWISE)
+        
+        if self.flag_rotate_xy == 0:
+            self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        elif self.flag_rotate_xy == 90:
+            pass
+            # self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        elif self.flag_rotate_xy == 180:
+            self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_90_CLOCKWISE)
+        elif self.flag_rotate_xy == 270:
+            self.img_xy = cv2.rotate(self.img_xy, cv2.ROTATE_180)
+
         w, h = self.img_xy.shape
         self.vb_xy.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         adjusted = cv2.convertScaleAbs(self.img_xy, alpha=self.alpha, beta=self.beta)
@@ -336,7 +383,16 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
     def set_y(self, y):
         navg = self.navg_val
         self.img_xz = np.squeeze(np.nanmean(self.data_3d[:, int(y):int(y)+navg, :], 1))
-        self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_180)
+
+        if self.flag_rotate_xz == 0:
+            pass
+        elif self.flag_rotate_xz == 90:
+            self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_90_CLOCKWISE)
+        elif self.flag_rotate_xz == 180:
+            self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_180)
+        elif self.flag_rotate_xz == 270:
+            self.img_xz = cv2.rotate(self.img_xz, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            
         w, h = self.img_xz.shape
         self.vb_xz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         adjusted = cv2.convertScaleAbs(self.img_xz, alpha=self.alpha, beta=self.beta)
@@ -346,7 +402,16 @@ class Render3DApp(QtWidgets.QMainWindow, Ui_MainWindow):
     def set_z(self, z):
         navg = self.navg_val
         self.img_yz = np.squeeze(np.nanmean(self.data_3d[:, :, int(z):int(z)+navg], 2))
-        self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_180)
+
+        if self.flag_rotate_yz == 0:
+            pass
+        elif self.flag_rotate_yz == 90:
+            self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_90_CLOCKWISE)
+        elif self.flag_rotate_yz == 180:
+            self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_180)
+        elif self.flag_rotate_yz == 270:
+            self.img_yz = cv2.rotate(self.img_yz, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            
         w, h = self.img_yz.shape
         self.vb_yz.setLimits(xMin=0, xMax=w, yMin=0, yMax=h)
         adjusted = cv2.convertScaleAbs(self.img_yz, alpha=self.alpha, beta=self.beta)
